@@ -1,0 +1,28 @@
+---
+title: "A stochastic model for the transmission of 2019-nCov in Wuhan"
+author: "John M. Drake"
+date: "1/25/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The epidemiology of the 2019-nCov in China is poorly understood.
+Here we seek to develop a model for the transmission of 2019-nCov during the early stages of transmission in Wuhan.
+This model may be useful for inference, forecasting or scenario analysis.
+
+## Strategy
+
+1. Develop a generative model based on clinical reports and outbreak investigations reported in the media and scientific literature.
+2. Estimate unknown parameters by fitting to data.
+3. Application of model to specific problems such as characterizing key unknown quantities (e.g. reporting rate) and forecasting.
+
+## Model construction
+
+Up to approximately January 25 the outbreak has remained small (hundreds of cases).
+Therefore, we will focus on stochastic models with intrinsic noise.
+
