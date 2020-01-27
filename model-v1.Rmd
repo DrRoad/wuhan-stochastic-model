@@ -1,7 +1,7 @@
 ---
 title: "A stochastic model for the transmission of 2019-nCov in Wuhan"
 author: "John M. Drake"
-date: "1/25/2020"
+date: "1/26/2020"
 output: pdf_document
 ---
 
@@ -33,18 +33,55 @@ From (https://github.com/jabacker/nCoV-2019/blob/master/Incubationperiod_2019nCo
 For simplicity, we assume an Erlang distribution with integer shape parameter of 6.
 Thus, we require six exposed classes.
 
-We do not yet have a model for the time in the infectious class.
-Indeed, we will seek to let this rate be a function of time itself to recognize the effect of case identification and isolation, social distancing, etc.
-For now, we will again assume an Erland distribution with integer shape parameter of 6.
-
-The basic function simulates one event in the transmission process.
+It is predicted that the time between onset of symptoms and isolation will decline as awareness and clinical capacity are increased (Cite: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0000020).
+Therefore, the traditional ``recovery'' parameter ($\gamma$) is set to a declining lineary function of time to recognize the effect increased awareness, case identification and isolation, social distancing, etc.
+Movement from the *I* to *R* is therefore assumed to be an Erlang distribution with integer shape parameter of 6, but time varying mean.
 
 For now, the model assumes a frequency-dependent force of infection of $\lambda=\beta \times Y/N$.
 This is reasonable for a respiratory infection that requires relatively close contact for infection to occur (compare: https://science.sciencemag.org/content/362/6410/75)
 **Ultimately, we hope to transfer estimates among different locations, therefore a force of infection that is intermediate between density-dependent and frequency-dependent transmission should be considered a high priority for further development.**
 
+# Support functions
+
+The first function returns the time-dependent recovery rate as a function of time.
+The default parameter values are taken from estimates of the speed at which case isolation increased during a 2003 outbreak of SARS in Singapore (Cite: https://doi.org/10.1371/journal.pone.0000020)
+
+```{r gamma}
+gamma <- function(b=0.137/7, a0=0.04/7, t){
+  # linear function
+  # arguments (names chosen to follow Drake et al. (2006) https://doi.org/10.1371/journal.pone.0000020)
+  # default parameters from "reduced model w/o week 8" estimates for SARS with units adjusted from weeks to days
+  #    b: intercept (positive)
+  #    a0: slope parameter (units of days, positive)
+  #    t: time in the model
+  
+  gamma <- b + a0*t
+  return(gamma)
+}
+```
+
+Here we plot the notional recovery rate against time for the first 60 days of the outbreak and the implied mean infectious period.
+A horizontal line shows the assumed constant value of 7 day infectious period.
+
+```{r recovery-rate-plot}
+t <- seq(0, 60)
+g <- gamma(t=t)
+par(mfrow=c(2,1))
+plot(t,g, type='l', xlab='Time (days)', ylab='Recovery rate')
+abline(h=1/7, lty=2, col='red')
+plot(t, 1/g, type='l', xlab='Time (days)', ylab='Infectious period (days)')
+abline(h=7, lty=2, col='red')
+
+```
+
+
+
+
+The basic function simulates one event in the transmission process.
+
 ```{r onestep}
 onestep <- function (x, params) {  #function to calculate one step of stochastic SIR
+  
   S <- x[2]                            #local variable for susceptibles
   
   E1 <- x[3]                           #exposed classes
@@ -65,9 +102,14 @@ onestep <- function (x, params) {  #function to calculate one step of stochastic
   
   R <- x[15]                          #local variable for recovereds
   N <- S+E1+E2+E3+E4+E5+E6+I1+I2+I3+I4+I5+I6+R                           #total population size (subject to demographic change)
+  
+  t <- x[16]                          #get current time
+  
+  
   with(                                #use with as in deterministic model to simplify code
        as.list(params), 
        {
+         gamma <- 6*gamma(b=b, a0=a0, t=t)  # multiplier 6 for pseudo stages
          rates <- c(beta*S*I/N,
                     sigma*E1, sigma*E2, sigma*E3, sigma*E4, sigma*E5, sigma*E6,
                     gamma*I1, gamma*I2, gamma*I3, gamma*I4, gamma*I5, gamma*I6)
@@ -86,12 +128,12 @@ onestep <- function (x, params) {  #function to calculate one step of stochastic
                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0,
                              
                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1),  #transitions into R
-                           ncol=length(x)-1, byrow=TRUE)
+                           ncol=length(x)-2, byrow=TRUE)
          tau <- -log(runif(1)) / sum(rates)   # exponential waiting time
          U <- runif(1)       #uniform random deviate
          m <- min(which(cumsum(rates)>=U*sum(rates)))
-         x <- x[2:length(x)] + changes[m,]
-         return(out <- c(tau, x))
+         x <- x[2:(length(x)-1)] + changes[m,]
+         return(out <- c(tau, x, tau+t))
        }
        )
 }
@@ -106,7 +148,7 @@ model <- function (x, params, nstep) {  #function to simulate stochastic SIR
   colnames(output) <- c("time","S",
                         "E1", "E2", "E3", "E4", "E5", "E6",
                         "I1", "I2", "I3", "I4", "I5", "I6",
-                        "R") #name variables
+                        "R", "cum.time") #name variables
   output[1,] <- x                           #first record of output is initial condition
   for (k in 1:nstep) {                      #iterate for nstep steps
     output[k+1,] <- x <- onestep(x,params)
@@ -127,7 +169,8 @@ Population size of Wuhan: $N \approx 11081000$ (Wikipedia)
 
 We assume $R_0=2.6$ as a notional value (Imperial College estimate)
 
-Recovery rate (assuming seven day infectious period): $\gamma = 6/7$
+Constant recovery rate (assuming seven day infectious period): $\gamma = 6/7$
+Note that this is a notional value and the current model includes a time-varying recovery rate.
 
 Transmissibility: $\beta = R_0 \times \gamma \approx 3.7$
 **Note: A better estimate of $\beta$ might be obtained by measuring the takeoff rate and calculating according to Wearing \& Rohani (https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020174#pmed-0020174-e004)**
@@ -140,15 +183,15 @@ Transition through incubation period (Becker): $\sigma=6/5.6$
 Here we evaluate the model. Note that this model assumes that all infectious cases are eventually reported.
 The difference between infectious cases in the community and reported cases simply reflect the lag between infection and isolation.
 For this simulation it is assumed that the initial number of infectious cases is 15 (the reported size of the initial cluster) distributed over the first three infectious pseudo-classes.
-The model is presumed to start on December 25.
+The model is presumed to start on December 15.
 
 ```{r evaluate}
 
-start <- as.Date('12/25/2019',format='%m/%d/%Y')
+start <- as.Date('12/15/2019',format='%m/%d/%Y')
 
 set.seed(1252019)                #set seed
 
-evaluate.model <- function(params=list(beta=3.7, gamma=6/7, sigma=6/5.6), nsims=2, pop.size=11081000, nstep=5000000){
+evaluate.model <- function(params=list(beta=3.7, sigma=6/5.6, b=0.137/7, a0=0.04/7), nsims=1, pop.size=11081000, nstep=10000000){
 
   E10 <- 0
   E20 <- 0
@@ -172,7 +215,8 @@ evaluate.model <- function(params=list(beta=3.7, gamma=6/7, sigma=6/5.6), nsims=
   xstart <- c(time=0, S=S0,
               E1=E10, E2=E20, E3=E30, E4=E40, E5=E50, E6=E60,
               I1=I10, I2=I20, I3=I30, I4=I40, I5=I50, I6=I60,
-              R=pop.size-E10-E20-E30-E40-E50-E60-S0-I10-I20-I30-I40-I50-I60) #initial conditions
+              R=pop.size-E10-E20-E30-E40-E50-E60-S0-I10-I20-I30-I40-I50-I60,
+              cum.time = 0) #initial conditions
   data <- vector(mode='list',length=nsims) #initialize list to store the output
   for (k in 1:nsims) {              #simulate nsims times
     data[[k]] <- as.data.frame(model(xstart,params,nstep))
@@ -200,7 +244,4 @@ evaluate.model <- function(params=list(beta=3.7, gamma=6/7, sigma=6/5.6), nsims=
 evaluate.model()
 ```
 
-
 This model predicts a somewhat faster epidemic growth than observed.
-This is not surprising since it does not reflect known interventions or the increase in isolation rate that was observed in both SARS and Ebola.
-Incorportaing a time varying value for $\gamma$ is the next step with this model.
