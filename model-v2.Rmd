@@ -118,8 +118,6 @@ onestep <- function (x, params) {  #function to calculate one step of stochastic
          rates <- as.numeric(c(beta*I/N,
                     sigmai, sigmai, sigmai, sigmai, sigmai, sigmai,
                     gammai, gammai, gammai, gammai, gammai, gammai))
-         
-         propensity <- sum(rates)
 
          states0 <- x[2:(length(x)-1)]
          
@@ -127,21 +125,21 @@ onestep <- function (x, params) {  #function to calculate one step of stochastic
          
          p <- matrix(0, nrow=length(rates),ncol=length(states0))                                     # matrix to hold transitions probs
                 
-         p[1,]  <- c(exp(-rates[1])*dt,1-exp(-rates[1]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)   # S-> E
+         p[1,]  <- c(exp(-rates[1]*dt),1-exp(-rates[1]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)   # S-> E
          
-         p[2,]  <- c(0, exp(-rates[2])*dt, 1-exp(-rates[2]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[3,]  <- c(0, 0, exp(-rates[3])*dt, 1-exp(-rates[3]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[4,]  <- c(0, 0, 0, exp(-rates[4])*dt, 1-exp(-rates[4]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[5,]  <- c(0, 0, 0, 0, exp(-rates[5])*dt, 1-exp(-rates[5]*dt), 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[6,]  <- c(0, 0, 0, 0, 0, exp(-rates[6])*dt, 1-exp(-rates[6]*dt), 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[7,]  <- c(0, 0, 0, 0, 0, 0, exp(-rates[7])*dt, 1-exp(-rates[7]*dt), 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[2,]  <- c(0, exp(-rates[2]*dt), 1-exp(-rates[2]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[3,]  <- c(0, 0, exp(-rates[3]*dt), 1-exp(-rates[3]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[4,]  <- c(0, 0, 0, exp(-rates[4]*dt), 1-exp(-rates[4]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[5,]  <- c(0, 0, 0, 0, exp(-rates[5]*dt), 1-exp(-rates[5]*dt), 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[6,]  <- c(0, 0, 0, 0, 0, exp(-rates[6]*dt), 1-exp(-rates[6]*dt), 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[7,]  <- c(0, 0, 0, 0, 0, 0, exp(-rates[7]*dt), 1-exp(-rates[7]*dt), 0, 0, 0, 0, 0, 0)    # Transitions out of E
          
-         p[8,]  <- c(0, 0, 0, 0, 0, 0, 0, exp(-rates[8])*dt, 1-exp(-rates[8]*dt), 0, 0, 0, 0, 0)    # Transitions out of I
-         p[9,]  <- c(0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[9])*dt, 1-exp(-rates[9]*dt), 0, 0, 0, 0)    # Transitions out of I
-         p[10,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[10])*dt, 1-exp(-rates[10]*dt), 0, 0, 0)    # Transitions out of I
-         p[11,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[11])*dt, 1-exp(-rates[11]*dt), 0, 0)    # Transitions out of I
-         p[12,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[12])*dt, 1-exp(-rates[12]*dt), 0)    # Transitions out of I
-         p[13,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[13])*dt, 1-exp(-rates[13]*dt))    # Transitions out of I
+         p[8,]  <- c(0, 0, 0, 0, 0, 0, 0, exp(-rates[8]*dt), 1-exp(-rates[8]*dt), 0, 0, 0, 0, 0)    # Transitions out of I
+         p[9,]  <- c(0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[9]*dt), 1-exp(-rates[9]*dt), 0, 0, 0, 0)    # Transitions out of I
+         p[10,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[10]*dt), 1-exp(-rates[10]*dt), 0, 0, 0)    # Transitions out of I
+         p[11,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[11]*dt), 1-exp(-rates[11]*dt), 0, 0)    # Transitions out of I
+         p[12,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[12]*dt), 1-exp(-rates[12]*dt), 0)    # Transitions out of I
+         p[13,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[13]*dt), 1-exp(-rates[13]*dt))    # Transitions out of I
 
          # update states
          
@@ -210,7 +208,7 @@ start <- as.Date('12/15/2019',format='%m/%d/%Y')
 
 set.seed(1252019)                #set seed
 
-evaluate.model <- function(params=list(beta=3.7, sigma=1/5.6, b=0.137/7, a0=0.04/7, dt=0.001), nsims=2, pop.size=11081000, nstep=10000){
+evaluate.model <- function(params=list(beta=3.7, sigma=1/5.6, b=0.137/7, a0=0.04/7, dt=0.005), nsims=2, pop.size=11081000, nstep=11000){
 
   E10 <- 0
   E20 <- 0
