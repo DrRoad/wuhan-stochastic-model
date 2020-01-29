@@ -1,6 +1,6 @@
 ---
 title: "A stochastic model for the transmission of 2019-nCov in Wuhan"
-author: "John M. Drake"
+author: "John M. Drake & Pej Rohani"
 date: "1/28/2020"
 output: pdf_document
 ---
