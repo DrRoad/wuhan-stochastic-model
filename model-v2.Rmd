@@ -127,21 +127,21 @@ onestep <- function (x, params) {  #function to calculate one step of stochastic
          
          p <- matrix(0, nrow=length(rates),ncol=length(states0))                                     # matrix to hold transitions probs
                 
-         p[1,]  <- c(exp(-rates[1])*dt,(1-exp(-rates[1])*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)   # S-> E
+         p[1,]  <- c(exp(-rates[1])*dt,1-exp(-rates[1]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)   # S-> E
          
-         p[2,]  <- c(0, exp(-rates[2])*dt, (1-exp(-rates[2])*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[3,]  <- c(0, 0, exp(-rates[3])*dt, (1-exp(-rates[3])*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[4,]  <- c(0, 0, 0, exp(-rates[4])*dt, (1-exp(-rates[4])*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[5,]  <- c(0, 0, 0, 0, exp(-rates[5])*dt, (1-exp(-rates[5])*dt), 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[6,]  <- c(0, 0, 0, 0, 0, exp(-rates[6])*dt, (1-exp(-rates[6])*dt), 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
-         p[7,]  <- c(0, 0, 0, 0, 0, 0, exp(-rates[7])*dt, (1-exp(-rates[7])*dt), 0, 0, 0, 0, 0, 0)    # Transitions out of E
-
-         p[8,]  <- c(0, 0, 0, 0, 0, 0, 0, exp(-rates[8])*dt, (1-exp(-rates[8])*dt), 0, 0, 0, 0, 0)    # Transitions out of E
-         p[9,]  <- c(0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[9])*dt, (1-exp(-rates[9])*dt), 0, 0, 0, 0)    # Transitions out of E
-         p[10,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[10])*dt, (1-exp(-rates[10])*dt), 0, 0, 0)    # Transitions out of E
-         p[11,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[11])*dt, (1-exp(-rates[11])*dt), 0, 0)    # Transitions out of E
-         p[12,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[12])*dt, (1-exp(-rates[12])*dt), 0)    # Transitions out of E
-         p[13,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[13])*dt, (1-exp(-rates[13])*dt))    # Transitions out of E
+         p[2,]  <- c(0, exp(-rates[2])*dt, 1-exp(-rates[2]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[3,]  <- c(0, 0, exp(-rates[3])*dt, 1-exp(-rates[3]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[4,]  <- c(0, 0, 0, exp(-rates[4])*dt, 1-exp(-rates[4]*dt), 0, 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[5,]  <- c(0, 0, 0, 0, exp(-rates[5])*dt, 1-exp(-rates[5]*dt), 0, 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[6,]  <- c(0, 0, 0, 0, 0, exp(-rates[6])*dt, 1-exp(-rates[6]*dt), 0, 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         p[7,]  <- c(0, 0, 0, 0, 0, 0, exp(-rates[7])*dt, 1-exp(-rates[7]*dt), 0, 0, 0, 0, 0, 0)    # Transitions out of E
+         
+         p[8,]  <- c(0, 0, 0, 0, 0, 0, 0, exp(-rates[8])*dt, 1-exp(-rates[8]*dt), 0, 0, 0, 0, 0)    # Transitions out of I
+         p[9,]  <- c(0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[9])*dt, 1-exp(-rates[9]*dt), 0, 0, 0, 0)    # Transitions out of I
+         p[10,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[10])*dt, 1-exp(-rates[10]*dt), 0, 0, 0)    # Transitions out of I
+         p[11,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[11])*dt, 1-exp(-rates[11]*dt), 0, 0)    # Transitions out of I
+         p[12,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[12])*dt, 1-exp(-rates[12]*dt), 0)    # Transitions out of I
+         p[13,] <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, exp(-rates[13])*dt, 1-exp(-rates[13]*dt))    # Transitions out of I
 
          # update states
          
